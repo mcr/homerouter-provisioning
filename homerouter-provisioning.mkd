@@ -27,8 +27,14 @@ author:
 normative:
   BCP14: RFC8174
   I-D.ietf-anima-bootstrapping-keyinfra:
+  RFC7084:
+  RFC6797:
+  RFC4193:
+  RFC8555:
+  I-D.ietf-anima-grasp:
 
 informative:
+  I-D.richardson-t2trg-idevid-considerations:
   sixtypercent:
     title: "The economics of the security of consumer-grade IoT products and services"
     target: "
@@ -120,6 +126,10 @@ Devices which are exclusively configured using smartphone apps, and which have n
 Smartphone apps can be provided with a private-CA trust anchor, and could easily be programmed to validate different parts of the certificate.
 The lifetime and DNS name issues are of significantly less of an issues as a result.
 However, the level of sophistication required to do the above coding is difficult to find in cross-platform mobile developers, and smartphone OS vendors are increasingly discouraging the use of private trust anchors.
+
+# Terminology
+
+{::boilerplate bcp14}
 
 # Protocol Overview
 
