@@ -1,12 +1,10 @@
-# ANIMA operational considerations for BRSKI Registrar
+# HOME ROUTER provisioning EXAMPLE
 
-The ANIMA WG Bootstrapping Remote Secure Key Infrastructure (BRSKI)
-protocol involves three parties: Pledge (device), Registrar and
-Manufacturer Authorized Signing Authority (MASA).
+This documents the proceedure used by the (Simple) Secure Home Gateway project.
 
-This repository contains operational considerations for the Registrar
-function.  It is a candidate document for the ANIMA WG
-http://datatracker.ietf.org/wg/anima 
+This is an internet draft which has not been adopted by any working group.
+It aims to be a Best Current Practices document.
+
 
 
 
