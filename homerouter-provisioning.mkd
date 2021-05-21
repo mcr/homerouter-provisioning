@@ -170,7 +170,7 @@ The result will be a Link-Layer IPv6 address and port number on which the home r
 
 A TLS/HTTPS connection is made to that address, using a virtual Host: that has been provisioning into the firmware by the manufacturer.
 (The same FQDN should go into the SNI for the TLS connection).
-The home router uses a trust anchor provisioned by the manufacturer, and {{RFC6125}} DNS-ID policy, to validate that the home router has been connected to an appropriate factory provisioning system.
+The home router uses a trust anchor provisioned by the manufacturer, and {{?RFC6125}} DNS-ID policy, to validate that the home router has been connected to an appropriate factory provisioning system.
 
 The CSR along with some particulars about the device (the chosen ULA, some serial number information), is transmitted in an HTTPS POST.
 The provisioning system treats this as a secure connection because it originates on an IPv6-Link-Local address.
