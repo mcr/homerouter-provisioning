@@ -23,6 +23,10 @@ author:
   org: Sandelman Software Works
   email: mcr+ietf@sandelman.ca
 
+- ins: C. Amsüss
+  name: Christian Amsüss
+  email: christian@amsuess.com
+
 normative:
   BCP14: RFC8174
   I-D.ietf-anima-bootstrapping-keyinfra:
