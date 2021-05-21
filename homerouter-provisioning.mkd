@@ -1,13 +1,13 @@
 ---
 title: Provisioning Initial Device Identifiers into Home Routers
 abbrev: homertr-provision
-docname: draft-richardson-homerouter-provisioning-00
+docname: draft-richardson-homerouter-provisioning-01
 
 stand_alone: true
 
 ipr: trust200902
 area: Internet
-wg: acme? Working Group
+wg: IOTOPS? Working Group
 kw: Internet-Draft
 cat: bcp
 
@@ -17,7 +17,6 @@ pi:    # can use array (if all yes) or hash here
   symrefs: yes
 
 author:
-
 
 - ins: M. Richardson
   name: Michael Richardson
@@ -62,22 +61,24 @@ This method is focused on home routers, but can in some cases be used by other c
 
 # Introduction
 
-The increasing push to move all web interactions to HTTPS is a good thing. {{RFC6797}} section 2.3.1 explains some of the attacks that this defeats.
+The increasing push to move all web interactions to HTTPS is a good thing.
+{{RFC6797}} section 2.3.1 explains some of the attacks that this defeats.
 
 Residential use devices, particularly home routers, have some very unfortunate challenges.
 The router provides access control for the entire home network: controlling access to the router is critical.
-Malware has so far, been content to attack the outside of home routers, exploiting poor authorization controls, and the fact that so few devices have their password changes (see {{sixtypercent}}).
+Malware has been, so far, content to attack the outside of home routers, exploiting poor authorization controls, and the fact that so few devices have their password changed (see {{sixtypercent}}).
 
 Malware continues to arrive by email and by trojan download, and one must assume that at least some devices within the home may be infected.
+
 An obvious next step for malware is to attack home routers and IoT devices from within the home.
 An unencrypted administrative interface to these devices presents two problems:
 
 1. for devices that continue to use passwords as authorization, the passwords can easily be seen by active eavesdropping of the network, including use of IP address spoofing attacks.
-In residential configurations, the layer-two wifi encryption does nothing to prevent address spoofing attacks.
+In residential configurations, the most common Layer Two (ethernet) wifi encryption does nothing to prevent address spoofing attacks at Layer Three (IP, ARP).
 
 2. the lack of a useable TLS/HTTPS mechanism makes it difficult to use any kind of other non-password authorization mechanisms, such TLS Client Certificates, or OAUTH2 (Bearer) Tokens.
 
-In addition to the above arguments relating to the control interface to these devices, there are some significant advantages in managemnt if every device has a cryptographic identity.
+In addition to the above arguments relating to the control interface to these devices, there are some significant advantages in management if every device has a cryptographic identity.
 They include: ability to do remote attestation, ease of use of "Enterprise" versions of WPA, such as EAP-TLS for WiFi connectivity, detection of counterfeit devices, and better security for interactions with a cloud.
 
 {{I-D.richardson-t2trg-idevid-considerations}} describes a number of different scenarios and considersation for manufacturer installation of keying material into devices.
@@ -96,16 +97,19 @@ As will be explained below, in order for the user's browser to be directed to th
 The Home Router is usually in a position to answer DNS queries from other devices in the home,
 so it can easily map names that should lead to the home router, to one of the home router's IP addresses.
 
+As an extension to the mechanism described here, a new mechanism is described in {{manyplex}} that provides for compatible naming of devices when control over DNS queries is not possible.
+
 ## Provisioning of certificates with public trust anchors
 
 The {{CABFORUM}} provides a set of guidelines agreed to by Browser authors and Certification Authorities (CA).
-A CA that follows the guidelines is likely to be able to negotiate to have their trust anchor included by default into the trusted set distributed by browsers and operating systems.
+A well funded CA that follows the guidelines is likely to be able to negotiate to have their trust anchor included by default into the trusted set distributed by browsers and operating systems.
 
-Few of the details of the guidelines do not concern this document: but the key point is that an  arbitrary manufacturer is unlikely to be able to negotiate directly, and will need to arrange to obtain certificates from one of the existing certification authorities, or it's suborbinate customers.
+Few of the details of the guidelines concern this document: but the key point is that an  arbitrary manufacturer is unlikely to be able to negotiate directly, and will need to arrange to obtain certificates from one of the existing certification authorities, or it's suborbinate customers.
 
 There are two details that do matter:
 
 1. CAs will not sign private names or reserved IP addresses.  Names used must be public and listed in the https://publicsuffix.org/ list.
+
 2. CAs are not to create certificates longer than a CABForum defined limit, which is currently set to approximately 1 year (in debate from approximately 2 years).  However, some CAs, such as https://letsencrypt.org/, use a lifetime of 90 days, and many CAs are moving in this direction as well.
 
 ## Manufacturers or ISPs do provisioning
@@ -118,15 +122,17 @@ This is common for OEMs that have outsourced the actual manufacturing elsewhere,
 An ISP who purchased a large quanity of home routers, and then upgrades the firmware could also easily adapt this mechanism.
 The upgraded devices are then put back into their boxes, and into a warehouse or logistics center before shipping them to customers.
 It is not uncommon for ISPs, particularly those that use PPPoE, to need to provision a PPP username/login to be used for initial provisioning into every device.
-Upon first being connected, the device users this default username to login to the ISP, at which point customer-specific username and login are configured, often using TR-069.
+Upon first being connected, the device uses this default username to login to the ISP (to some captive network), at which point customer-specific username and login are configured, often using TR-069.
 
 ## Users who use web browsers
 
-The process in this document benefits users with browsers (whether desktops or mobile browsers) who need to access a management interface of a home router or device.
+The process in this document benefits users with browsers (whether desktops or mobile browsers) who need to access a management interface of a home router or similiar device (such as a NAS or home automation system).
 
 Devices which are exclusively configured using smartphone apps, and which have no other interfaces will find some of the mechanism superfluous.
 Smartphone apps can be provided with a private-CA trust anchor, and could easily be programmed to validate different parts of the certificate.
+
 The lifetime and DNS name issues are of significantly less of an issues as a result.
+
 However, the level of sophistication required to do the above coding is difficult to find in cross-platform mobile developers, and smartphone OS vendors are increasingly discouraging the use of private trust anchors.
 
 # Terminology
@@ -149,54 +155,51 @@ The home router uses all or a portion of the ULA to form a DNS name that is uniq
 For instance, given the ULA fd96:8d23:4fea::/48, one could drop the initial 7 bits which are always the same, skip a bit, and truncate to 6 bytes, giving: 8d234f.
 A name is formed, for instance: n8d234f.r.example.net.
 
-With this name, a Certificate Signing Request is formed, binding the name n8d234f.r.example.net
-to the public key derived above.
+With this name, a Certificate Signing Request is formed, binding the name n8d234f.r.example.net to the public key derived above.
 
 The router then looks and waits for a network attachment on any of it's (physical) ethernet interfaces.
 This mechanism does not work for devices with only WiFi interfaces, but typical home routers have at least one physical interface used to connect to the Internet.
 Even integrated VDSL or LTE modems with a primarily WiFi orientation usually have at least one physical LAN port.
 
-Some devices distinguish a "WAN" interface, and other devices either only one network interface,
-or do not initally distinguish a specific one.
-The recommendation to listen on any interface makes provisioning the systems less labour intensive as any connection is an acceptable one.
+Some devices distinguishes a "WAN" interface, and other devices either only one network interface, or do not initally distinguish a specific one.
+A recommendation is to listen on any interface, as this makes provisioning the systems require less skilled labour: any connector that fits is acceptable.
 
-Upon finding a network connection, the home router uses the {{I-D.ietf-anima-grasp}} protocol to
-do an M_DISCOVER for a service called "PROVISIONING".
+Upon finding a network connection, the home router uses the {{I-D.ietf-anima-grasp}} protocol to do an M_DISCOVER for a service called "PROVISIONING".
 This is done using Link-Layer IPv6 addresses.
 The result will be a Link-Layer IPv6 address and port number on which the home router should connect.
 
 A TLS/HTTPS connection is made to that address, using a virtual Host: that has been provisioning into the firmware by the manufacturer.
 (The same FQDN should go into the SNI for the TLS connection).
-The home router uses a trust anchor provisioned by the manufacturer to validate that the home router
-has been connected to an appropriate factory provisioning system.
+The home router uses a trust anchor provisioned by the manufacturer, and {{RFC6125}} DNS-ID policy, to validate that the home router has been connected to an appropriate factory provisioning system.
 
-The CSR along with some particulars about the device (the chosen ULA, some serial number information), is transmitted in a POST.
+The CSR along with some particulars about the device (the chosen ULA, some serial number information), is transmitted in an HTTPS POST.
 The provisioning system treats this as a secure connection because it originates on an IPv6-Link-Local address.
-It is permissible that the provisioning system is elsewhere, but that there is a local provisioning device which will relay traffic to the provisioning system.
+(It is reasonable that the provisioning system is elsewhere, but that there is a local provisioning device which will relay traffic to the provisioning system)
 
-The provisioning system obtains a certificate using the {{RFC8555}} DNS-01 challenge.
+The provisioning system obtains a certificate using ACME, and an {{RFC8555}} DNS-01 challenge.
 This may require up to a minute in order to do the DNS update, wait for propogation, and then receive the resulting certificate.
 
-The device has provided its DNS name to the provisioning system, so the provisioning system
-installs that name into the DNS with a AAAA record giving the ULA address that the device has provided.
-As part of the DNS-01 challenge, some challenge records are installed as proof of control of the
-name.
+The device has provided its DNS name to the provisioning system, so the provisioning system installs that name into the DNS with a AAAA record giving the ULA address that the device has provided.
+(As part of the DNS-01 challenge, some challenge records are installed as proof of control of the name)
 
 The provisioning system then returns the certificate to the device.
-The provisioning system SHOULD keep a copy of the certificate in a database; should the provisioning process fail before the device writes all its state to non-volatile memory, then the provisioning
-system need not repeat the certificate process.
+The provisioning system SHOULD keep a copy of the certificate in a database; should the provisioning process fail before the device writes all its state to non-volatile memory, then the provisioning system need not repeat the certificate process.
 
 The device now has a certificate for a name that it knows is its own.
 The device now creates a local DNS mapping (aka "/etc/hosts") from the name it has chosen to the ULA address it has chosen.
-The device, even when not connected to the Internet, will answer DNS queries for that name from client systems, mapping the name to the address, and then responding on port 443 to HTTPS queries for that name.
+The device, even when not connected to the Internet, will answer DNS queries for that name from client systems, mapping the name to the address, and then responding on port 443 to  HTTPS queries for that name.
 
 # Protocol Details
 
-Many bits to fill in.
+Many small details to fill in.
 
 # Certificate Expiry/Renewal Protocol
 
 Via store-and-forward with some javascript on port 80 and/or an App.
+
+# Using wildcard certificates with private network addresses {#manyplex}
+
+To be further described.
 
 # Privacy Considerations
 
