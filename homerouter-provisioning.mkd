@@ -1,7 +1,7 @@
 ---
 title: Provisioning Initial Device Identifiers into Home Routers
 abbrev: homertr-provision
-docname: draft-richardson-homerouter-provisioning-01
+docname: draft-richardson-homerouter-provisioning-02
 
 stand_alone: true
 
@@ -25,7 +25,7 @@ author:
 
 normative:
   BCP14: RFC8174
-  I-D.ietf-anima-bootstrapping-keyinfra:
+  RFC8995:
   RFC7084:
   RFC6797:
   RFC4193:
